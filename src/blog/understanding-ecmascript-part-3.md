@@ -294,7 +294,7 @@ This might be confusing at first. `Identifier` is defined like this:
 
 `await` is a `ReservedWord`, so how can an `Identifier` ever be `await`?
 
-Turns out, `Identifier` cannot be `await`, but it can be something else whose `StringValue` is `"await"` &mdash; a different representation of the character sequence `await`. For example, the Unicode escape sequence for `a` is `\0061`, so `\u0061wait` has the `StringValue` `"await"`. `\u0061wait` won't be recognized as a keyword by the lexical grammar, instead it will be an `Identifier`. The static semantic rule forbids using it as a identifier inside async functions.
+Turns out, `Identifier` cannot be `await`, but it can be something else whose `StringValue` is `"await"` &mdash; a different representation of the character sequence `await`. For example, the Unicode escape sequence for `a` is `\0061`, so `\u0061wait` has the `StringValue` `"await"`. `\u0061wait` won't be recognized as a keyword by the lexical grammar, instead it will be an `Identifier`. The static semantics forbid using it as a identifier inside async functions.
 
 So this works:
 
