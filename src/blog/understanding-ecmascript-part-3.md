@@ -107,7 +107,7 @@ For example, this code works:
 
 ```javascript
 function old() {
-  var await = 900;
+  var await;
   console.log(await);
 }
 ```
@@ -116,13 +116,15 @@ However, if we're inside an async function, `await` is treated as a keyword. So 
 
 ```javascript
 async function modern() {
-  var await = 900; // Syntax error
+  var await; // Syntax error
 }
 ```
 
-Let's look at how the grammar rules for `VariableStatement` are defined. At the first glance, the grammar rules can look a bit scary:
+### Productions and shorthands
 
-> <code>VariableStatement<sub>[Yield, Await]</sub> :</code>
+Let's look at how the productions for `VariableStatement` are defined. At the first glance, the grammar can look a bit scary:
+
+> [<code>VariableStatement<sub>[Yield, Await]</sub> :</code>](https://tc39.es/ecma262/#prod-VariableStatement)
 > <code>var VariableDeclarationList<sub>[+In, ?Yield, ?Await]</sub>;</code>
 
 What do the subscripts means? We have not only `[Yield, Await]` but also `+` in `+In` and the `?` in `?Await`. What does all that mean?
@@ -131,9 +133,9 @@ The notation is explained in section [Grammar Notation](https://tc39.es/ecma262/
 
 The subscripts are a shorthand for expressing a set of productions, for a set of left-hand side symbols, all at once. The left-hand side symbol has two parameters, so the "real" left-hand side symbols we're defining are `VariableStatement`, `VariableStatement_Yield`, `VariableStatement_Await` and `VariableStatement_Yield_Await`.
 
-Here the plain `VariableStatement` means "`VariableStatement` without `_Await` and without `_Yield`" and shoud not be confused with <code>VariableStatement<sub>[Yield, Await]</sub></code>.
+Note that here the plain `VariableStatement` means "`VariableStatement` without `_Await` and without `_Yield`" and shoud not be confused with <code>VariableStatement<sub>[Yield, Await]</sub></code>.
 
-On the right hand side of the production, we see the shorthand `+In`, meaning "use the version with `_In`", and `?Await`, meaning "use the version with `_Await` iff the left-hand side symbol has `_Await` (similarly with `?Yield`).
+On the right-hand side of the production, we see the shorthand `+In`, meaning "use the version with `_In`", and `?Await`, meaning "use the version with `_Await` iff the left-hand side symbol has `_Await` (similarly with `?Yield`).
 
 (The third shorthand, `~Foo`, meaning "use the version without `_Foo`", is not used in this production.)
 
@@ -151,33 +153,27 @@ With this information, we can expand the productions like this:
 > `VariableStatement_Yield_Await` :
 > `var VariableDeclarationList_In_Yield_Await;`
 
-We can follow the productions further and keep track of the parameters. For example, all productions for `VariableDeclarationList` just carry them on as is:
-
-> <code>VariableDeclarationList<sub>[In, Yield, Await]</sub> :</code>
-> <code>VariableDeclaration<sub>[?In, ?Yield, ?Await]</sub></code>
-> <code>VariableDeclarationList<sub>[?In, ?Yield, ?Await]</sub> , VariableDeclaration<sub>[?In, ?Yield, ?Await]</sub></code>
-
-Ultimately, we'll need to know two things: 1) Where is it decided whether we're in the case with `_Await` or without `_Await`? 2) Where does it make a difference &mdash; where do the productions for `Something_Await` and `Something` (without `_Await`) diverge?
+Ultimately, we'll need to find out two things: 1) Where is it decided whether we're in the case with `_Await` or without `_Await`? 2) Where does it make a difference &mdash; where do the productions for `Something_Await` and `Something` (without `_Await`) diverge?
 
 ### `_Await` or no `_Await`?
 
-Let's tackle question 1 first. It's somewhat easy to guess that non-async functions and async functions differ in whether we pick the parameter `_Await` for the function body or not. Reading the rules for async function declarations, we find this:
+Let's tackle question 1 first. It's somewhat easy to guess that non-async functions and async functions differ in whether we pick the parameter `_Await` for the function body or not. Reading the productions for async function declarations, we find this:
 
-> `AsyncFunctionBody :`
+> [`AsyncFunctionBody :`](https://tc39.es/ecma262/#prod-AsyncFunctionBody)
 > <code>FunctionBody<sub>[~Yield, +Await]</sub></code>
 
-Note that `AsyncFunctionBody` has no parameters, but they're introduced here.
+Note that `AsyncFunctionBody` has no parameters &mdash; they get added to the `FunctionBody` on the right-hand side.
 
 If we expand this production, we get:
 
 > `AsyncFunctionBody :`
 > `FunctionBody_Await`
 
-So `FunctionBody_Await` means a function body where `await` is treated as a keyword.
+Since `FunctionBody_Await` is used for async functions, it means a function body where `await` is treated as a keyword.
 
 On the other hand, if we're inside a non-async function, the relevant production is:
 
-> <code>FunctionDeclaration<sub>[Yield, Await, Default]</sub> :</code>
+> [<code>FunctionDeclaration<sub>[Yield, Await, Default]</sub>](https://tc39.es/ecma262/#prod-FunctionDeclaration) :</code>
 > <code>function BindingIdentifier<sub>[?Yield, ?Await]</sub> ( FormalParameters<sub>[~Yield, ~Await]</sub> ) { FunctionBody<sub>[~Yield, ~Await]</sub> }</code>
 
 (`FunctionDeclaration` has another production, but it's not relevant for our code example.)
@@ -202,8 +198,89 @@ The important thing in this production is that `FunctionBody` is parameterized w
 
 This rule doesn't apply to the function name and formal parameters though: they get the parameters `_Await` and `_Yield` if the left-hand side symbol has them.
 
+To summarize: Async functions have a `FunctionBody_Await` and non-async functions have a `FunctionBody` (without `_Await`). You can think of the `_Await` parameter meaning "`await` is a keyword.
+
+Since we're talking about non-generator functions, both our async example function and our non-async example function are parameterized without `_Yield`.
+
 ### Disallowing `await` as an identifier
 
-We saw that async functions have a `FunctionBody_Await` and non-async functions have a `FunctionBody` (without `_Await`). Next, we need to find out how `await` is disallowed as an identifier if we're inside a `FunctionBody_Await`.
+Next, we need to find out how `await` is disallowed as an identifier if we're inside a `FunctionBody_Await`.
 
-We can follow the productions further to see that they get carried unchanged from `AsyncFunctionBody` and `FunctionBody` all the way to the `VariableStatement` production we were previously looking at.
+We can follow the productions further to see that the `_Await` parameter gets carried unchanged from `FunctionBody` all the way to the `VariableStatement` production we were previously looking at.
+
+Thus, inside an async function, we'll have a `VariableStatement_Await` and inside a non-async function, we'll have a `VariableStatement`.
+
+We can follow the productions further and keep track of the parameters. We already saw the productions for `VariableStatement`:
+
+> [<code>VariableStatement<sub>[Yield, Await]</sub> :</code>](https://tc39.es/ecma262/#prod-VariableStatement)
+> <code>var VariableDeclarationList<sub>[+In, ?Yield, ?Await]</sub>;</code>
+
+All productions for `VariableDeclarationList` just carry the parameters on as is:
+
+> [<code>VariableDeclarationList<sub>[In, Yield, Await]</sub> :</code>](https://tc39.es/ecma262/#prod-VariableDeclarationList)
+> <code>VariableDeclaration<sub>[?In, ?Yield, ?Await]</sub></code>
+
+(Here we show only the production relevant to our example.)
+
+> [<code>VariableDeclaration<sub>[In, Yield, Await]</sub> :</code>](https://tc39.es/ecma262/#prod-VariableDeclaration)
+> <code>BindingIdentifier<sub>[?Yield, ?Await]</sub> Initializer<sub>[?In, ?Yield, ?Await]</sub> opt</code>
+
+The `opt` shorthand means that the right-hand side symbol is optional; there are in fact two productions, one with the optional symbol, and one without.
+
+In the simple case relevant to our example, `VariableStatement` consists of the keyword `var`, followed by a single `BindingIdentifier` without an initializer, and ending with a semicolon.
+
+To disallow or allow `await` as a `BindingIdentifier`, we hope to end up with something like this:
+
+> `BindingIdentifier_Await :`
+> `Identifier`
+> `yield`
+>
+> `BindingIdentifier :`
+> `Identifier`
+> `yield`
+> `await`
+
+This would disallow `await` as a variable name inside async functions and allow it as a variable name inside non-async functions.
+
+But the spec doesn't define it like this, instead we find this production:
+
+> [<code>BindingIdentifier<sub>[Yield, Await]</sub> :</code>](https://tc39.es/ecma262/#prod-BindingIdentifier)
+> `Identifier`
+> `yield`
+> `await`
+
+Expanded, this means the following productions:
+
+> `BindingIdentifier_Await :`
+> `Identifier`
+> `yield`
+> `await`
+>
+> `BindingIdentifier :`
+> `Identifier`
+> `yield`
+> `await`
+
+(We're omitting the productions for `BindingIdentifier_Yield` and `BindingIdentifier_Yield_Await` which are not used in our example.)
+
+This looks like `await` and `yield` would be always allowed as identifiers. What's up with that? Is the whole blog post for nothing?
+
+### Statics semantics to the rescue
+
+Turns out **static semantics** are needed for forbidding `await` as a variable name inside async functions.
+
+Static semantics describe static rules &mdash; that is, rules that can be checked statically, before the program is ran &mdash; related to grammar productions.
+
+In this case, the static semantics define the following rule:
+
+>[`BindingIdentifier : await`](https://tc39.es/ecma262/#sec-identifiers-static-semantics-early-errors)
+>
+> It's a Syntax Error if this production has an <sub>[Await]</sub> parameter.
+
+Effecntively, this forbids the `BindingIdentifier_Await : await` production.
+
+The spec explains that the reason for having this production but defining it as a Syntax Error by the static semantics is because of interference with automatic semicolon insertion. If the production was missing, automatic semicolon insertion might kick in and insert a semicolon into a program which is syntactically incorrect only because it uses `await` or `yield` as an identifier, changing the meaning of the program.
+
+## Summary
+
+In this episode, we familiarized ourselves with the ECMAScript syntactic grammar and the shorthands used for defining the productions. As an example, we looked into forbidding using `await` as an identifier inside async functions but allowing it inside non-async functions.
