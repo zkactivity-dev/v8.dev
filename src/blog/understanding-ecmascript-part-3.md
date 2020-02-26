@@ -127,7 +127,7 @@ Let's look at how the productions for `VariableStatement` are defined. At the fi
 > [<code>VariableStatement<sub>[Yield, Await]</sub> :</code>](https://tc39.es/ecma262/#prod-VariableStatement)
 > <code>var VariableDeclarationList<sub>[+In, ?Yield, ?Await]</sub>;</code>
 
-What do the subscripts means? We have not only `[Yield, Await]` but also `+` in `+In` and the `?` in `?Await`. What does all that mean?
+What do the subscripts (`[Yield, Await]`) and prefixes (`+` in `+In` and `?` in `?Async`) mean?
 
 The notation is explained in section [Grammar Notation](https://tc39.es/ecma262/#sec-grammar-notation).
 
@@ -169,7 +169,7 @@ If we expand this production, we get:
 > `AsyncFunctionBody :`
 > `FunctionBody_Await`
 
-Since `FunctionBody_Await` is used for async functions, it means a function body where `await` is treated as a keyword.
+Since `FunctionBody_Await` is used for async functions. It means a function body where `await` is treated as a keyword.
 
 On the other hand, if we're inside a non-async function, the relevant production is:
 
@@ -240,7 +240,7 @@ To disallow or allow `await` as a `BindingIdentifier`, we hope to end up with so
 > `yield`
 > `await`
 
-This would disallow `await` as a variable name inside async functions and allow it as a variable name inside non-async functions.
+This would disallow `await` as an identifier inside async functions and allow it as an identifier inside non-async functions.
 
 But the spec doesn't define it like this, instead we find this production:
 
@@ -261,25 +261,59 @@ Expanded, this means the following productions:
 > `yield`
 > `await`
 
-(We're omitting the productions for `BindingIdentifier_Yield` and `BindingIdentifier_Yield_Await` which are not used in our example.)
+(We're omitting the productions for `BindingIdentifier_Yield` and `BindingIdentifier_Yield_Await` which are not needed in our example.)
 
 This looks like `await` and `yield` would be always allowed as identifiers. What's up with that? Is the whole blog post for nothing?
 
 ### Statics semantics to the rescue
 
-Turns out **static semantics** are needed for forbidding `await` as a variable name inside async functions.
+Turns out **static semantics** are needed for forbidding `await` as an identifier inside async functions.
 
 Static semantics describe static rules &mdash; that is, rules that can be checked statically, before the program is ran &mdash; related to grammar productions.
 
-In this case, the static semantics define the following rule:
+In this case, the [static semantics](https://tc39.es/ecma262/#sec-identifiers-static-semantics-early-errors) define the following rule:
 
->[`BindingIdentifier : await`](https://tc39.es/ecma262/#sec-identifiers-static-semantics-early-errors)
+>`BindingIdentifier : await`
 >
-> It's a Syntax Error if this production has an <sub>[Await]</sub> parameter.
+> It's a Syntax Error if this production has an <code><sub>[Await]</sub></code> parameter.
 
-Effecntively, this forbids the `BindingIdentifier_Await : await` production.
+Effectively, this forbids the `BindingIdentifier_Await : await` production.
 
 The spec explains that the reason for having this production but defining it as a Syntax Error by the static semantics is because of interference with automatic semicolon insertion. If the production was missing, automatic semicolon insertion might kick in and insert a semicolon into a program which is syntactically incorrect only because it uses `await` or `yield` as an identifier, changing the meaning of the program.
+
+There's also another related rule:
+
+> `BindingIdentifier : Identifier`
+>
+> It is a Syntax Error if this production has an <code><sub>[Await]</sub></code> parameter and `StringValue` of `Identifier` is `"await"`.
+
+This might be confusing at first. `Identifier` is defined like this:
+
+> [`Identifier :`](https://tc39.es/ecma262/#prod-Identifier)
+> `IdentifierName` but not `ReservedWord`
+
+`await` is a `ReservedWord`, so how can an `Identifier` ever be `await`?
+
+Turns out, `Identifier` cannot be `await`, but it can be something else whose `StringValue` is `"await"` &mdash; a different representation of the character sequence `await`. For example, the Unicode escape sequence for `a` is `\0061`, so `\u0061wait` has the `StringValue` `"await"`. `\u0061wait` won't be recognized as a keyword by the lexical grammar, instead it will be an `Identifier`. The static semantic rule forbids using it as a identifier inside async functions.
+
+So this works:
+
+```javascript
+function old() {
+  var \0061wait;
+  console.log(await);
+}
+```
+
+And this doesn't:
+
+```javascript
+async function modern() {
+  var \0061wait; // Syntax error
+}
+```
+
+
 
 ## Summary
 
