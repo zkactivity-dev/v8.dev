@@ -3,7 +3,7 @@ title: 'Understanding the ECMAScript spec, part 3'
 author: '[Marja Hölttä](https://twitter.com/marjakh), speculative specification spectator'
 avatars:
   - marja-holtta
-date: 2020-02-11 13:33:37
+date: 2020-03-02 13:33:37
 tags:
   - ECMAScript
 description: 'Tutorial on reading the ECMAScript specification'
@@ -93,7 +93,7 @@ The [numeric string grammar](https://tc39.es/ecma262/#sec-tonumber-applied-to-th
 
 The [syntactic grammar](https://tc39.es/ecma262/#sec-syntactic-grammar) describes how syntactically correct programs are composed of tokens.
 
-The notation used for different grammars differs slightly. For example, the syntactic grammar uses `Symbol :` whereas the lexical grammar use and the RegExp grammar use `Symbol ::` and the numeric string grammar uses `Symbol :::`.
+The notation used for different grammars differs slightly. For example, the syntactic grammar uses `Symbol :` whereas the lexical grammar and the RegExp grammar use `Symbol ::` and the numeric string grammar uses `Symbol :::`.
 
 For the rest of this episode, we'll focus on the syntactic grammar.
 
@@ -153,7 +153,9 @@ With this information, we can expand the productions like this:
 > `VariableStatement_Yield_Await` :
 > `var VariableDeclarationList_In_Yield_Await;`
 
-Ultimately, we'll need to find out two things: 1) Where is it decided whether we're in the case with `_Await` or without `_Await`? 2) Where does it make a difference &mdash; where do the productions for `Something_Await` and `Something` (without `_Await`) diverge?
+Ultimately, we'll need to find out two things:
+1. Where is it decided whether we're in the case with `_Await` or without `_Await`?
+1. Where does it make a difference &mdash; where do the productions for `Something_Await` and `Something` (without `_Await`) diverge?
 
 ### `_Await` or no `_Await`?
 
@@ -194,9 +196,9 @@ The expanded form of the production is:
 > `FunctionDeclaration_Yield_Await :`
 > `function BindingIdentifier_Yield_Await ( FormalParameters_Yield_Await ) { FunctionBody }`
 
-The important thing in this production is that `FunctionBody` is parameterized with `[~Yield, ~Await]`, meaning that we always take the version without `_Yield` and without `_Await`, no matter what the parameters of `FunctionDeclaration` were.
+In this production we always get `FunctionBody` (without `_Yield` and without `_Await`), since the `FunctionBody` in the non-expanded production is parameterized with `[~Yield, ~Await]`.
 
-This rule doesn't apply to the function name and formal parameters though: they get the parameters `_Await` and `_Yield` if the left-hand side symbol has them.
+Function name and formal parameters are treated differently: they get the parameters `_Await` and `_Yield` if the left-hand side symbol has them.
 
 To summarize: Async functions have a `FunctionBody_Await` and non-async functions have a `FunctionBody` (without `_Await`). You can think of the `_Await` parameter meaning "`await` is a keyword.
 
