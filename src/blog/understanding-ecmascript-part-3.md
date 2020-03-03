@@ -200,7 +200,7 @@ In this production we always get `FunctionBody` (without `_Yield` and without `_
 
 Function name and formal parameters are treated differently: they get the parameters `_Await` and `_Yield` if the left-hand side symbol has them.
 
-To summarize: Async functions have a `FunctionBody_Await` and non-async functions have a `FunctionBody` (without `_Await`). You can think of the `_Await` parameter meaning "`await` is a keyword.
+To summarize: Async functions have a `FunctionBody_Await` and non-async functions have a `FunctionBody` (without `_Await`). You can think of the `_Await` parameter meaning "`await` is a keyword".
 
 Since we're talking about non-generator functions, both our async example function and our non-async example function are parameterized without `_Yield`.
 
