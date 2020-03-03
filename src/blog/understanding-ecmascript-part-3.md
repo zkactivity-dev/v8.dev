@@ -39,7 +39,7 @@ const r = /foo/;
 //        ^ this is the start of a RegularExpressionLiteral
 ```
 
-A similar thing happens with templates &mdash; the interpretation of <code>{`</code> depends on the context we're in:
+A similar thing happens with templates &mdash; the interpretation of <code>}`</code> depends on the context we're in:
 
 ```javascript
 const what1 = 'temp';
