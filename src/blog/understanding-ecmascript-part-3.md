@@ -133,7 +133,7 @@ The notation is explained in section [Grammar Notation](https://tc39.es/ecma262/
 
 The subscripts are a shorthand for expressing a set of productions, for a set of left-hand side symbols, all at once. The left-hand side symbol has two parameters, so the "real" left-hand side symbols we're defining are `VariableStatement`, `VariableStatement_Yield`, `VariableStatement_Await` and `VariableStatement_Yield_Await`.
 
-Note that here the plain `VariableStatement` means "`VariableStatement` without `_Await` and without `_Yield`" and shoud not be confused with <code>VariableStatement<sub>[Yield, Await]</sub></code>.
+Note that here the plain `VariableStatement` means "`VariableStatement` without `_Await` and `_Yield`". It should not be confused with <code>VariableStatement<sub>[Yield, Await]</sub></code>.
 
 On the right-hand side of the production, we see the shorthand `+In`, meaning "use the version with `_In`", and `?Await`, meaning "use the version with `_Await` iff the left-hand side symbol has `_Await`" (similarly with `?Yield`).
 
