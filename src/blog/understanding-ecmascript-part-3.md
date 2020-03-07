@@ -135,7 +135,7 @@ The subscripts are a shorthand for expressing a set of productions, for a set of
 
 Note that here the plain `VariableStatement` means "`VariableStatement` without `_Await` and `_Yield`". It should not be confused with <code>VariableStatement<sub>[Yield, Await]</sub></code>.
 
-On the right-hand side of the production, we see the shorthand `+In`, meaning "use the version with `_In`", and `?Await`, meaning "use the version with `_Await` iff the left-hand side symbol has `_Await`" (similarly with `?Yield`).
+On the right-hand side of the production, we see the shorthand `+In`, meaning "use the version with `_In`", and `?Await`, meaning "use the version with `_Await` if and only if the left-hand side symbol has `_Await`" (similarly with `?Yield`).
 
 (The third shorthand, `~Foo`, meaning "use the version without `_Foo`", is not used in this production.)
 
