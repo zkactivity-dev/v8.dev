@@ -271,7 +271,7 @@ This looks like `await` and `yield` would be always allowed as identifiers. What
 
 Turns out **static semantics** are needed for forbidding `await` as an identifier inside async functions.
 
-Static semantics describe static rules &mdash; that is, rules that can be checked before the program is ran.
+Static semantics describe static rules &mdash; that is, rules that are checked before the program runs.
 
 In this case, the [static semantics for BindingIdentifier](https://tc39.es/ecma262/#sec-identifiers-static-semantics-early-errors) define the following syntax-directed rule:
 
