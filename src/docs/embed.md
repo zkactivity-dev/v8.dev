@@ -129,6 +129,7 @@ It is important to be aware of one common pitfall with this model: *you cannot r
 // This function returns a new array with three elements, x, y, and z.
 Local<Array> NewPointArray(int x, int y, int z) {
   v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
 
   // We will be creating temporary handles so we use a handle scope.
   v8::EscapableHandleScope handle_scope(isolate);
@@ -136,14 +137,10 @@ Local<Array> NewPointArray(int x, int y, int z) {
   // Create a new empty array.
   v8::Local<v8::Array> array = v8::Array::New(isolate, 3);
 
-  // Return an empty result if there was an error creating the array.
-  if (array.IsEmpty())
-    return v8::Local<v8::Array>();
-
   // Fill out the values
-  array->Set(0, Integer::New(isolate, x));
-  array->Set(1, Integer::New(isolate, y));
-  array->Set(2, Integer::New(isolate, z));
+  array->Set(context, 0, Integer::New(isolate, x)).Check();
+  array->Set(context, 1, Integer::New(isolate, y)).Check();
+  array->Set(context, 2, Integer::New(isolate, z)).Check();
 
   // Return the value through Escape.
   return handle_scope.Escape(array);
@@ -195,7 +192,7 @@ The following code provides an example of creating a template for the global obj
 // Create a template for the global object and set the
 // built-in global functions.
 v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
-global->Set(v8::String::NewFromUtf8(isolate, "log"),
+global->Set(v8::String::NewFromUtf8(isolate, "log").ToLocalChecked(),
             v8::FunctionTemplate::New(isolate, LogCallback));
 
 // Each processor gets its own context so different processors
@@ -227,15 +224,15 @@ void XGetter(v8::Local<v8::String> property,
 
 void XSetter(v8::Local<v8::String> property, v8::Local<v8::Value> value,
              const v8::PropertyCallbackInfo<void>& info) {
-  x = value->Int32Value();
+  x = value->Int32Value(info.GetIsolate()->GetCurrentContext()).ToChecked();
 }
 
 // YGetter/YSetter are so similar they are omitted for brevity
 
 v8::Local<v8::ObjectTemplate> global_templ = v8::ObjectTemplate::New(isolate);
-global_templ->SetAccessor(v8::String::NewFromUtf8(isolate, "x"),
+global_templ->SetAccessor(v8::String::NewFromUtf8(isolate, "x").ToLocalChecked(),
                           XGetter, XSetter);
-global_templ->SetAccessor(v8::String::NewFromUtf8(isolate, "y"),
+global_templ->SetAccessor(v8::String::NewFromUtf8(isolate, "y").ToLocalChecked(),
                           YGetter, YSetter);
 v8::Persistent<v8::Context> context =
     v8::Context::v8::New(isolate, nullptr, global_templ);
@@ -274,10 +271,12 @@ Here the internal field count is set to `1` which means the object has one inter
 Add the `x` and `y` accessors to the template:
 
 ```cpp
-point_templ->SetAccessor(v8::String::NewFromUtf8(isolate, "x"),
-                         GetPointX, SetPointX);
-point_templ->SetAccessor(v8::String::NewFromUtf8(isolate, "y"),
-                         GetPointY, SetPointY);
+point_templ->SetAccessor(
+    v8::String::NewFromUtf8(isolate, "x").ToLocalChecked(),
+    GetPointX, SetPointX);
+point_templ->SetAccessor(
+    v8::String::NewFromUtf8(isolate, "y").ToLocalChecked(),
+    GetPointY, SetPointY);
 ```
 
 Next, wrap a C++ point by creating a new instance of the template and then setting the internal field `0` to an external wrapper around the point `p`.
@@ -309,7 +308,8 @@ void SetPointX(v8::Local<v8::String> property, v8::Local<v8::Value> value,
   v8::Local<v8::External> wrap =
       v8::Local<v8::External>::Cast(self->GetInternalField(0));
   void* ptr = wrap->Value();
-  static_cast<Point*>(ptr)->x_ = value->Int32Value();
+  static_cast<Point*>(ptr)->x_ =
+      value->Int32Value(info.GetIsolate()->GetCurrentContext()).ToChecked();
 }
 ```
 
@@ -349,8 +349,9 @@ void JsHttpRequestProcessor::MapGet(v8::Local<v8::String> name,
 
   // Otherwise fetch the value and wrap it in a JavaScript string.
   const string &value = (*iter).second;
-  info.GetReturnValue().Set(v8::String::NewFromUtf8(
-      value.c_str(), v8::String::kNormalString, value.length()));
+  info.GetReturnValue().Set(
+      v8::String::NewFromUtf8(value.c_str(), v8::String::kNormalString,
+                              value.length()).ToLocalChecked());
 }
 ```
 
@@ -420,9 +421,9 @@ The same approach is used in V8 with templates. Each `FunctionTemplate` has a `P
 ```cpp
 v8::Local<v8::FunctionTemplate> biketemplate = v8::FunctionTemplate::New(isolate);
 biketemplate->PrototypeTemplate().Set(
-    v8::String::NewFromUtf8(isolate, "wheels"),
-    v8::FunctionTemplate::New(isolate, MyWheelsMethodCallback)->GetFunction()
-);
+    v8::String::NewFromUtf8(isolate, "wheels").ToLocalChecked(),
+    v8::FunctionTemplate::New(isolate, MyWheelsMethodCallback)
+        ->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 ```
 
 This causes all instances of `biketemplate` to have a `wheels` method in their prototype chain which, when called, causes the C++ function `MyWheelsMethodCallback` to be called.
