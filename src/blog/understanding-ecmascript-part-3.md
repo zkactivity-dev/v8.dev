@@ -33,7 +33,7 @@ The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-g
 There are several cases where the next token cannot be identified purely by looking at the Unicode character stream, but we need to know where we are in the syntactic grammar. A classic example is `/`. To know whether it's a division or the start of the RegExp, we need to know which one is allowed in the syntactic context we're currently in.
 
 For example:
-```javascript
+```js
 const x = 10 / 5;
 //           ^ this is a DivPunctuator
 
@@ -43,7 +43,7 @@ const r = /foo/;
 
 A similar thing happens with templates &mdash; the interpretation of <code>}`</code> depends on the context we're in:
 
-```javascript
+```js
 const what1 = 'temp';
 const what2 = 'late';
 const t = `I am a ${ what1 + what2 }`;
@@ -107,7 +107,7 @@ Let's have a closer look at allowing `await` as an identifier (`yield` works sim
 
 For example, this code works:
 
-```javascript
+```js
 function my_non_async_function() {
   var await;
   console.log(await);
@@ -116,7 +116,7 @@ function my_non_async_function() {
 
 However, if we're inside an async function, `await` is treated as a keyword. So this code doesn't work:
 
-```javascript
+```js
 async function my_async_function() {
   var await; // Syntax error
 }
@@ -304,7 +304,7 @@ For example, the Unicode escape sequence for `a` is `\0061`, so `\u0061wait` has
 
 So this works:
 
-```javascript
+```js
 function my_non_async_function() {
   var \0061wait;
   console.log(await);
@@ -313,7 +313,7 @@ function my_non_async_function() {
 
 And this doesn't:
 
-```javascript
+```js
 async function my_async_function() {
   var \0061wait; // Syntax error
 }
