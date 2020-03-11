@@ -20,15 +20,15 @@ If you're not familiar with [context-free grammars](https://en.wikipedia.org/wik
 
 ## ECMAScript grammars
 
-ECMAScript source text is a sequence of Unicode code points. Each Unicode code point is an integral value between `U+0000` and `U+10FFFF`. The actual encoding (for example, UTF-8 or UTF-16) is not important &mdash; we assume that the source code has already been converted into a sequence of Unicode code points according to the encoding it was in.
+The spec defines ECMAScript source text as a sequence of Unicode characters. This means that variable names are not limited to ASCII characters but can also include other Unicode characters, such as emojis. The spec doesn't talk about the actual encoding (for example, UTF-8 or UTF-16). We assume that the source code has already been converted into a sequence of Unicode characters according to the encoding it was in.
 
 The spec contains several grammars which we'll briefly describe next.
 
 ### Lexical grammar
 
-The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how Unicode code points are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
+The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how Unicode characters are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
 
-There are several cases where the next token cannot be identified purely by looking at the Unicode code point stream, but we need to know where we are in the syntactic grammar. A classic example is `/`. To know whether it's a division or the start of the RegExp, we need to know which one is allowed in the syntactic context we're currently in.
+There are several cases where the next token cannot be identified purely by looking at the Unicode character stream, but we need to know where we are in the syntactic grammar. A classic example is `/`. To know whether it's a division or the start of the RegExp, we need to know which one is allowed in the syntactic context we're currently in.
 
 For example:
 ```javascript
@@ -85,7 +85,7 @@ We can imagine the syntactic grammar analyzer ("parser") calling the lexical gra
 
 ### Other grammars
 
-The [RegExp grammar](https://tc39.es/ecma262/#sec-patterns) describes how Unicode code points are translated into regular expressions.
+The [RegExp grammar](https://tc39.es/ecma262/#sec-patterns) describes how Unicode characters are translated into regular expressions.
 
 We can imagine the parser asking the tokenizer for the next token in a context where RegExps are allowed. If the tokenizer returns `RegularExpressionLiteral`, we branch into the RegExp grammar for converting the string of the `RegularExpressionLiteral` into a RegExp pattern.
 
