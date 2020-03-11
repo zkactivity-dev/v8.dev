@@ -32,7 +32,9 @@ The [RegExp grammar](https://tc39.es/ecma262/#sec-patterns) describes how Unicod
 
 The [numeric string grammar](https://tc39.es/ecma262/#sec-tonumber-applied-to-the-string-type) describes how Strings are translated into numeric values.
 
-The grammars use slighlty different notations: the syntactic grammar uses `LeftHandSideSymbol :` whereas the lexical grammar and the RegExp grammar use `LeftHandSideSymbol ::` and the numeric string grammar uses `LeftHandSideSymbol :::`.
+Each grammar is defined as a context-free grammar, consisting of a set of production rules.
+
+The grammars use slighlty different notation: the syntactic grammar uses `LeftHandSideSymbol :` whereas the lexical grammar and the RegExp grammar use `LeftHandSideSymbol ::` and the numeric string grammar uses `LeftHandSideSymbol :::`.
 
 Next we'll look into the lexical grammar and the syntactic grammar in more detail.
 
@@ -40,7 +42,7 @@ Next we'll look into the lexical grammar and the syntactic grammar in more detai
 
 The spec defines ECMAScript source text as a sequence of Unicode characters. This means that variable names are not limited to ASCII characters but can also include other Unicode characters, such as emojis. The spec doesn't talk about the actual encoding (for example, UTF-8 or UTF-16). We assume that the source code has already been converted into a sequence of Unicode characters according to the encoding it was in.
 
-It's not possible to tokenize ECMAScript source code in advance, which makes the lexical grammar slightly more complicated.
+It's not possible to tokenize ECMAScript source code in advance, which makes defining the lexical grammar slightly more complicated.
 
 For example, we cannot determine whether `/` is the division operator or the start of a RegExp without looking at the larger context it occurs:
 
@@ -98,7 +100,7 @@ We can imagine the syntactic grammar analyzer ("parser") calling the lexical gra
 
 ## Syntactic grammar
 
-We looked into the lexical grammar, which defines how we construct tokens from Unicode characters. The [syntactic grammar](https://tc39.es/ecma262/#sec-syntactic-grammar) builds on it: It defines how syntactically correct programs are composed of tokens.
+We looked into the lexical grammar, which defines how we construct tokens from Unicode characters. The syntactic grammar builds on it: It defines how syntactically correct programs are composed of tokens.
 
 ### Example: Allowing legacy identifiers
 
