@@ -20,11 +20,25 @@ In [part 2](/blog/understanding-ecmascript-part-2), we examined a simple grammar
 
 If you're not familiar with [context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar), now it's a good time to check out the basics, since the spec uses context-free grammars to define the language.
 
+## ECMAScript grammars
+
+The ECMAScript spec defines four grammars:
+
+The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how Unicode characters are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
+
+The [syntactic grammar](https://tc39.es/ecma262/#sec-syntactic-grammar) defines how syntactically correct programs are composed of tokens.
+
+The [RegExp grammar](https://tc39.es/ecma262/#sec-patterns) describes how Unicode characters are translated into regular expressions.
+
+The [numeric string grammar](https://tc39.es/ecma262/#sec-tonumber-applied-to-the-string-type) describes how Strings are translated into numeric values.
+
+The grammars use slighlty different notations: the syntactic grammar uses `LeftHandSideSymbol :` whereas the lexical grammar and the RegExp grammar use `LeftHandSideSymbol ::` and the numeric string grammar uses `LeftHandSideSymbol :::`.
+
+Next we'll look into the lexical grammar and the syntactic grammar in more detail.
+
 ## Lexical grammar
 
 The spec defines ECMAScript source text as a sequence of Unicode characters. This means that variable names are not limited to ASCII characters but can also include other Unicode characters, such as emojis. The spec doesn't talk about the actual encoding (for example, UTF-8 or UTF-16). We assume that the source code has already been converted into a sequence of Unicode characters according to the encoding it was in.
-
-The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how Unicode characters are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
 
 It's not possible to tokenize ECMAScript source code in advance, which makes the lexical grammar slightly more complicated.
 
@@ -38,7 +52,7 @@ const r = /foo/;
 //        ^ this is the start of a RegularExpressionLiteral
 ```
 
-A similar thing happens with templates &mdash; the interpretation of <code>}`</code> depends on the context it occurs:
+Templates introduce a similar ambiguity &mdash; the interpretation of <code>}`</code> depends on the context it occurs:
 
 ```js
 const what1 = 'temp';
@@ -85,8 +99,6 @@ We can imagine the syntactic grammar analyzer ("parser") calling the lexical gra
 ## Syntactic grammar
 
 We looked into the lexical grammar, which defines how we construct tokens from Unicode characters. The [syntactic grammar](https://tc39.es/ecma262/#sec-syntactic-grammar) builds on it: It defines how syntactically correct programs are composed of tokens.
-
-The syntactic grammar notation differs slightly from the lexical grammar. In the productions, the syntactic grammar uses `LeftHandSideSymbol :` whereas the lexical grammar uses `LeftHandSideSymbol ::`.
 
 ### Example: Allowing legacy identifiers
 
@@ -307,16 +319,6 @@ async function my_async_function() {
   var \0061wait; // Syntax error
 }
 ```
-
-## Other grammars
-
-In addition to the lexical grammar and the syntactic grammar, the spec defines two other grammars:
-
-The [RegExp grammar](https://tc39.es/ecma262/#sec-patterns) describes how Unicode characters are translated into regular expressions.
-
-We can imagine the parser asking the tokenizer for the next token in a context where RegExps are allowed. If the tokenizer returns `RegularExpressionLiteral`, we branch into the RegExp grammar for converting the string of the `RegularExpressionLiteral` into a RegExp pattern.
-
-The [numeric string grammar](https://tc39.es/ecma262/#sec-tonumber-applied-to-the-string-type) describes how Strings are translated into numeric values.
 
 ## Summary
 
