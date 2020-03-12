@@ -24,11 +24,11 @@ If you're not familiar with [context-free grammars](https://en.wikipedia.org/wik
 
 The ECMAScript spec defines four grammars:
 
-The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how Unicode characters are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
+The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how Unicode code points are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
 
 The [syntactic grammar](https://tc39.es/ecma262/#sec-syntactic-grammar) defines how syntactically correct programs are composed of tokens.
 
-The [RegExp grammar](https://tc39.es/ecma262/#sec-patterns) describes how Unicode characters are translated into regular expressions.
+The [RegExp grammar](https://tc39.es/ecma262/#sec-patterns) describes how Unicode code points are translated into regular expressions.
 
 The [numeric string grammar](https://tc39.es/ecma262/#sec-tonumber-applied-to-the-string-type) describes how Strings are translated into numeric values.
 
@@ -40,7 +40,7 @@ Next we'll look into the lexical grammar and the syntactic grammar in more detai
 
 ## Lexical grammar
 
-The spec defines ECMAScript source text as a sequence of Unicode characters. This means that variable names are not limited to ASCII characters but can also include other Unicode characters, such as emojis. The spec doesn't talk about the actual encoding (for example, UTF-8 or UTF-16). We assume that the source code has already been converted into a sequence of Unicode characters according to the encoding it was in.
+The spec defines ECMAScript source text as a sequence of Unicode code points. For example, variable names are not limited to ASCII characters but can also include other Unicode characters, such as emojis. The spec doesn't talk about the actual encoding (for example, UTF-8 or UTF-16). It assumes that the source code has already been converted into a sequence of Unicode code points according to the encoding it was in.
 
 It's not possible to tokenize ECMAScript source code in advance, which makes defining the lexical grammar slightly more complicated.
 
@@ -100,7 +100,7 @@ We can imagine the syntactic grammar analyzer ("parser") calling the lexical gra
 
 ## Syntactic grammar
 
-We looked into the lexical grammar, which defines how we construct tokens from Unicode characters. The syntactic grammar builds on it: It defines how syntactically correct programs are composed of tokens.
+We looked into the lexical grammar, which defines how we construct tokens from Unicode code points. The syntactic grammar builds on it: It defines how syntactically correct programs are composed of tokens.
 
 ### Example: Allowing legacy identifiers
 
@@ -177,7 +177,7 @@ If we expand this production, we get:
 > `AsyncFunctionBody :`
 > `FunctionBody_Await`
 
-Since `FunctionBody_Await` is used for async functions. It means a function body where `await` is treated as a keyword.
+In other words, async functions have `FunctionBody_Await`, meaning a function body where `await` is treated as a keyword.
 
 On the other hand, if we're inside a non-async function, the relevant production is:
 
@@ -289,9 +289,9 @@ In this case, the [static semantics for BindingIdentifier](https://tc39.es/ecma2
 
 Effectively, this forbids the `BindingIdentifier_Await : await` production.
 
-The spec explains that the reason for having this production but defining it as a Syntax Error by the static semantics is because of interference with automatic semicolon insertion.
+The spec explains that the reason for having this production but defining it as a Syntax Error by the static semantics is because of interference with automatic semicolon insertion (ASI).
 
-Remember that automatic semicolon insertion (ASI) kicks in when the code is syntactically incorrect. It tries to add semicolons to make the code syntactically correct. (We'll describe ASI in more detail in a later episode.)
+Remember that ASI kicks in when we're unable to parse a line of code according to the grammar productions. ASI tries to add semicolons to satisfy the requirement that statements and declarations must end with a semicolon. (We'll describe ASI in more detail in a later episode.)
 
 Consider the following code (example from the spec):
 
@@ -313,7 +313,7 @@ async function too_few_semicolons() {
 
 This kind of inference with ASI was deemed too confusing, so static semantics were used for disallowing `await` as an identifier.
 
-If the production was missing, automatic semicolon insertion might kick in and insert a semicolon into a program which is syntactically incorrect only because it uses `await` or `yield` as an identifier, changing the meaning of the program.
+### Disallowed `StringValues` of identifiers
 
 There's also another related rule:
 
