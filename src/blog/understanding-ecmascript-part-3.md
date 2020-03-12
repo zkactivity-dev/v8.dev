@@ -289,7 +289,31 @@ In this case, the [static semantics for BindingIdentifier](https://tc39.es/ecma2
 
 Effectively, this forbids the `BindingIdentifier_Await : await` production.
 
-The spec explains that the reason for having this production but defining it as a Syntax Error by the static semantics is because of interference with automatic semicolon insertion. If the production was missing, automatic semicolon insertion might kick in and insert a semicolon into a program which is syntactically incorrect only because it uses `await` or `yield` as an identifier, changing the meaning of the program.
+The spec explains that the reason for having this production but defining it as a Syntax Error by the static semantics is because of interference with automatic semicolon insertion.
+
+Remember that automatic semicolon insertion (ASI) kicks in when the code is syntactically incorrect. It tries to add semicolons to make the code syntactically correct. (We'll describe ASI in more detail in a later episode.)
+
+Consider the following code (example from the spec):
+
+```js
+async function too_few_semicolons() {
+    let
+    await 0;
+}
+```
+
+If the grammar disallowed `await` as an identifier, ASI would kick in and transform the code into the following grammatically correct code, which also uses `let` as an identifier:
+
+```js
+async function too_few_semicolons() {
+    let;
+    await 0;
+}
+```
+
+This kind of inference with ASI was deemed too confusing, so static semantics were used for disallowing `await` as an identifier.
+
+If the production was missing, automatic semicolon insertion might kick in and insert a semicolon into a program which is syntactically incorrect only because it uses `await` or `yield` as an identifier, changing the meaning of the program.
 
 There's also another related rule:
 
@@ -328,3 +352,5 @@ async function my_async_function() {
 ## Summary
 
 In this episode, we familiarized ourselves with the lexical grammar, syntactic grammar, and the shorthands used for defining the productions. As an example, we looked into forbidding using `await` as an identifier inside async functions but allowing it inside non-async functions.
+
+Other interesting parts of the syntactic grammar, such as automatic semicolon insertion and cover grammars will be covered in a later episode.
