@@ -104,7 +104,7 @@ We looked into the lexical grammar, which defines how we construct tokens from U
 
 ### Example: Allowing legacy identifiers
 
-Introducing new keywords to the grammar is a possibly breaking change &mdash; what if existing code already uses the keywords as identifiers?
+Introducing a new keyword to the grammar is a possibly breaking change &mdash; what if existing code already uses the keyword as an identifier?
 
 For example, before `await` was a keyword, someone might have written the following code:
 
@@ -122,7 +122,7 @@ async function modern() {
 }
 ```
 
-Allowing `yield` as an identifier in non-generators and disallowing it in generators works similarly; let's focus on the `await` case for the rest of the post.
+Allowing `yield` as an identifier in non-generators and disallowing it in generators works similarly.
 
 Understanding how `await` is allowed as an identifier requires understanding ECMAScript-specific syntactic grammar notation. Let's dive right in!
 
