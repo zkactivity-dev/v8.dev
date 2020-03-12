@@ -104,26 +104,27 @@ We looked into the lexical grammar, which defines how we construct tokens from U
 
 ### Example: Allowing legacy identifiers
 
-In some contexts, `await` and `yield` are allowed identifiers. Finding out when exactly they are allowed can be a bit involved, so let's dive right in!
+Introducing new keywords to the grammar is a possibly breaking change &mdash; what if existing code already uses the keywords as identifiers?
 
-Let's have a closer look at allowing `await` as an identifier (`yield` works similarly).
-
-For example, this code works:
+For example, before `await` was a keyword, someone might have written the following code:
 
 ```js
-function my_non_async_function() {
+function old() {
   var await;
-  console.log(await);
 }
 ```
 
-However, if we're inside an async function, `await` is treated as a keyword. So this code doesn't work:
+The ECMAScript grammar carefully added the `await` keyword in such a way that this code will continue to work. Inside async functions, `await` is a keyword, so this doesn't work:
 
 ```js
-async function my_async_function() {
+async function modern() {
   var await; // Syntax error
 }
 ```
+
+Allowing `yield` as an identifier in non-generators and disallowing it in generators works similarly; let's focus on the `await` case for the rest of the post.
+
+Understanding how `await` is allowed as an identifier requires understanding ECMAScript-specific syntactic grammar notation. Let's dive right in!
 
 ### Productions and shorthands
 
@@ -205,9 +206,11 @@ In this production we always get `FunctionBody` (without `_Yield` and without `_
 
 Function name and formal parameters are treated differently: they get the parameters `_Await` and `_Yield` if the left-hand side symbol has them.
 
-To summarize: Async functions have a `FunctionBody_Await` and non-async functions have a `FunctionBody` (without `_Await`). You can think of the `_Await` parameter meaning "`await` is a keyword".
+To summarize: Async functions have a `FunctionBody_Await` and non-async functions have a `FunctionBody` (without `_Await`). Since we're talking about non-generator functions, both our async example function and our non-async example function are parameterized without `_Yield`.
 
-Since we're talking about non-generator functions, both our async example function and our non-async example function are parameterized without `_Yield`.
+Maybe it's hard to remember which one is `FunctionBody` and which `FunctionBody_Await`. Is `FunctionBody_Await` for a function where `await` is an identifier, or for a function where `await` is a keyword?
+
+You can think of the `_Await` parameter meaning "`await` is a keyword". This approach is also future proof. Imagine a new keyword, `blob` being added, but only inside "blobby" functions. Non-blobby non-async non-generators would still have `FunctionBody` (without `_Await`, `_Yield` or `_Blob`), exactly like they have now. Blobby functions would have a `FunctionBody_Blob`, async blobby functions would have `FunctionBody_Await_Blob` and so on.
 
 ### Disallowing `await` as an identifier
 
