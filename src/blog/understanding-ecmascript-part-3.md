@@ -24,7 +24,7 @@ If you're not familiar with [context-free grammars](https://en.wikipedia.org/wik
 
 The ECMAScript spec defines four grammars:
 
-The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how Unicode code points are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
+The [lexical grammar](https://tc39.es/ecma262/#sec-ecmascript-language-lexical-grammar) describes how [Unicode code points](https://en.wikipedia.org/wiki/Unicode#Architecture_and_terminology) are translated into a sequence of **input elements** (tokens, line terminators, comments, white space).
 
 The [syntactic grammar](https://tc39.es/ecma262/#sec-syntactic-grammar) defines how syntactically correct programs are composed of tokens.
 
