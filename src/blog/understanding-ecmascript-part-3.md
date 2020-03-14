@@ -70,6 +70,8 @@ if (0 == 1) {
 
 ```
 
+Even though the interpretation of `/` and <code>}`</code> depends on their "context" &mdash; their position in the syntactic structure of the code &mdash; the grammars we'll describe next are still context-free.
+
 The lexical grammar uses several goal symbols to distinguish between the contexts where some input elements are permitted and some are not. For example, the goal symbol `InputElementDiv` is used in contexts where `/` is a division and `/=` is a division-assignment. The `InputElementDiv` productions list the possible tokens which can be produced in this context:
 
 > [`InputElementDiv ::`](https://tc39.es/ecma262/#prod-InputElementDiv)
@@ -328,29 +330,28 @@ This might be confusing at first. `Identifier` is defined like this:
 
 `await` is a `ReservedWord`, so how can an `Identifier` ever be `await`?
 
-Turns out, `Identifier` cannot be `await`, but it can be something else whose `StringValue` is `"await"` &mdash; a different representation of the character sequence `await`. [Static semantics for identifier names](https://tc39.es/ecma262/#sec-identifier-names-static-semantics-stringvalue) define how the `StringValue` of an identifier name is computed.
+Turns out, `Identifier` cannot be `await`, but it can be something else whose `StringValue` is `"await"` &mdash; a different representation of the character sequence `await`.
 
-For example, the Unicode escape sequence for `a` is `\0061`, so `\u0061wait` has the `StringValue` `"await"`. `\u0061wait` won't be recognized as a keyword by the lexical grammar, instead it will be an `Identifier`. The static semantics for forbid using it as a variable name inside async functions.
+[Static semantics for identifier names](https://tc39.es/ecma262/#sec-identifier-names-static-semantics-stringvalue) define how the `StringValue` of an identifier name is computed. For example, the Unicode escape sequence for `a` is `\u0061`, so `\u0061wait` has the `StringValue` `"await"`. `\u0061wait` won't be recognized as a keyword by the lexical grammar, instead it will be an `Identifier`. The static semantics for forbid using it as a variable name inside async functions.
 
 So this works:
 
 ```js
-function my_non_async_function() {
+function old() {
   var \0061wait;
-  console.log(await);
 }
 ```
 
 And this doesn't:
 
 ```js
-async function my_async_function() {
+async function modern() {
   var \0061wait; // Syntax error
 }
 ```
 
 ## Summary
 
-In this episode, we familiarized ourselves with the lexical grammar, syntactic grammar, and the shorthands used for defining the productions. As an example, we looked into forbidding using `await` as an identifier inside async functions but allowing it inside non-async functions.
+In this episode, we familiarized ourselves with the lexical grammar, the syntactic grammar, and the shorthands used for defining the syntactic grammar. As an example, we looked into forbidding using `await` as an identifier inside async functions but allowing it inside non-async functions.
 
-Other interesting parts of the syntactic grammar, such as automatic semicolon insertion and cover grammars will be covered in a later episode.
+Other interesting parts of the syntactic grammar, such as automatic semicolon insertion and cover grammars will be covered in a later episode. Stay tuned!
