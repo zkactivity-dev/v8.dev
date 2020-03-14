@@ -48,11 +48,15 @@ For example, we cannot determine whether `/` is the division operator or the sta
 
 ```js
 const x = 10 / 5;
-//           ^ this is a DivPunctuator
-
-const r = /foo/;
-//        ^ this is the start of a RegularExpressionLiteral
 ```
+
+Here `/` is a DivPunctuator.
+
+```js
+const r = /foo/;
+```
+
+Here the first `/` is the start of a RegularExpressionLiteral.
 
 Templates introduce a similar ambiguity &mdash; the interpretation of <code>}`</code> depends on the context it occurs:
 
@@ -60,15 +64,16 @@ Templates introduce a similar ambiguity &mdash; the interpretation of <code>}`</
 const what1 = 'temp';
 const what2 = 'late';
 const t = `I am a ${ what1 + what2 }`;
-// `I am a ${ is TemplateHead
-// }` is TemplateTail
+```
 
+Here <code>\`I am a ${</code> is TemplateHead and <code>}\`</code> is TemplateTail.
+
+```js
 if (0 == 1) {
 }`not very useful`;
-// } is RightBracePunctuator
-// ` is the start of a NoSubstitutionTemplate
-
 ```
+
+Here `}` is RightBracePunctuator and <code>\`</code> is the start of a NoSubstitutionTemplate.
 
 Even though the interpretation of `/` and <code>}`</code> depends on their "context" &mdash; their position in the syntactic structure of the code &mdash; the grammars we'll describe next are still context-free.
 
