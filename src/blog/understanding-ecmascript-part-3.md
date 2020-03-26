@@ -335,7 +335,7 @@ This might be confusing at first. `Identifier` is defined like this:
 
 `await` is a `ReservedWord`, so how can an `Identifier` ever be `await`?
 
-Turns out, `Identifier` cannot be `await`, but it can be something else whose `StringValue` is `"await"` &mdash; a different representation of the character sequence `await`.
+As it turns out, `Identifier` cannot be `await`, but it can be something else whose `StringValue` is `"await"` &mdash; a different representation of the character sequence `await`.
 
 [Static semantics for identifier names](https://tc39.es/ecma262/#sec-identifier-names-static-semantics-stringvalue) define how the `StringValue` of an identifier name is computed. For example, the Unicode escape sequence for `a` is `\u0061`, so `\u0061wait` has the `StringValue` `"await"`. `\u0061wait` won't be recognized as a keyword by the lexical grammar, instead it will be an `Identifier`. The static semantics for forbid using it as a variable name inside async functions.
 
