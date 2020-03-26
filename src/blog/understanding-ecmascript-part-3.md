@@ -44,7 +44,7 @@ The spec defines ECMAScript source text as a sequence of Unicode code points. Fo
 
 It's not possible to tokenize ECMAScript source code in advance, which makes defining the lexical grammar slightly more complicated.
 
-For example, we cannot determine whether `/` is the division operator or the start of a RegExp without looking at the larger context it occurs:
+For example, we cannot determine whether `/` is the division operator or the start of a RegExp without looking at the larger context it occurs in:
 
 ```js
 const x = 10 / 5;
