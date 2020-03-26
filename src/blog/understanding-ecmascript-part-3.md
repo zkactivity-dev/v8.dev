@@ -18,7 +18,7 @@ In [part 1](/blog/understanding-ecmascript-part-1), we read through a simple met
 
 In [part 2](/blog/understanding-ecmascript-part-2), we examined a simple grammar production and how its runtime semantics are defined. In [the extra content](/blog/extra/understanding-ecmascript-part-2-extra), we also followed a long grammar production chain from `AssignmentExpression` to `MemberExpression`. In this episode, we'll go deeper in the definition of the ECMAScript language and its syntax.
 
-If you're not familiar with [context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar), now it's a good time to check out the basics, since the spec uses context-free grammars to define the language.
+If you're not familiar with [context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar), now is a good time to check out the basics, since the spec uses context-free grammars to define the language.
 
 ## ECMAScript grammars
 
