@@ -150,7 +150,7 @@ Note that here the plain `VariableStatement` means "`VariableStatement` without 
 
 On the right-hand side of the production, we see the shorthand `+In`, meaning "use the version with `_In`", and `?Await`, meaning "use the version with `_Await` if and only if the left-hand side symbol has `_Await`" (similarly with `?Yield`).
 
-(The third shorthand, `~Foo`, meaning "use the version without `_Foo`", is not used in this production.)
+The third shorthand, `~Foo`, meaning "use the version without `_Foo`", is not used in this production.
 
 With this information, we can expand the productions like this:
 
