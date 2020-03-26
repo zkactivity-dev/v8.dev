@@ -58,7 +58,7 @@ const r = /foo/;
 
 Here the first `/` is the start of a RegularExpressionLiteral.
 
-Templates introduce a similar ambiguity &mdash; the interpretation of <code>}`</code> depends on the context it occurs:
+Templates introduce a similar ambiguity &mdash; the interpretation of <code>}`</code> depends on the context it occurs in:
 
 ```js
 const what1 = 'temp';
