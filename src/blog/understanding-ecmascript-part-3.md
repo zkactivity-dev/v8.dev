@@ -284,7 +284,7 @@ This looks like `await` and `yield` would be always allowed as identifiers. What
 
 ### Statics semantics to the rescue
 
-Turns out **static semantics** are needed for forbidding `await` as an identifier inside async functions.
+It turns out that **static semantics** are needed for forbidding `await` as an identifier inside async functions.
 
 Static semantics describe static rules &mdash; that is, rules that are checked before the program runs.
 
