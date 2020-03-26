@@ -142,7 +142,7 @@ Let's look at how the productions for `VariableStatement` are defined. At the fi
 
 What do the subscripts (`[Yield, Await]`) and prefixes (`+` in `+In` and `?` in `?Async`) mean?
 
-The notation is explained in section [Grammar Notation](https://tc39.es/ecma262/#sec-grammar-notation).
+The notation is explained in the section [Grammar Notation](https://tc39.es/ecma262/#sec-grammar-notation).
 
 The subscripts are a shorthand for expressing a set of productions, for a set of left-hand side symbols, all at once. The left-hand side symbol has two parameters, so the "real" left-hand side symbols we're defining are `VariableStatement`, `VariableStatement_Yield`, `VariableStatement_Await` and `VariableStatement_Yield_Await`.
 
